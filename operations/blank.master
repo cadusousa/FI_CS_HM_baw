@@ -1,0 +1,71 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="blank.master.cs" Inherits="admin" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BAW</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+<script type="text/javascript">
+    document.onkeydown = function (event) {
+        if (event.keyCode == 37 && event.altKey) {
+            return false;
+        }
+        if (event.keyCode == 39 && event.altKey) {
+            return false;
+        }
+        if (event.keyCode == 8 && event.target.localName == "body") {
+            return false;
+        }
+    } 
+</script> 
+<script type="text/javascript">
+    if (document.addEventListener) { // IE >= 9; otros exploradores
+        document.addEventListener('contextmenu', function (e) {
+            alert("Esta acción no esta permitida."); //mensaje a mostrar
+            e.preventDefault();
+        }, false);
+    } else { // IE < 9
+        document.attachEvent('oncontextmenu', function () {
+            alert("Esta acción no esta permitida.");
+            window.event.returnValue = false;
+        });
+    }
+</script>
+</head>
+
+<body onload="JavaScript:document.body.focus();" onkeydown="return showKeyCode(event)">
+    <form id="form1" runat="server">
+        <% UsuarioBean user = null;
+            user = (UsuarioBean)Session["usuario"];%>
+        <div id="container">
+            <div id="wrapper">
+                <div id="content">
+                    <div style="font-weight: bold; font-style: italic; vertical-align: middle; text-align: left; color: #993400; font-size: 15px; text-transform: uppercase; text-decoration: underline overline;">
+                        <%
+                        UsuarioBean usuario = null;
+                        usuario = (UsuarioBean)Session["usuario"];
+                        lbl_nombre_sistema.Text = usuario.pais.Nombre_Sistema;
+                        %>
+                        <asp:Label ID="lbl_nombre_sistema" runat="server"></asp:Label>
+                    </div>
+                    <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+

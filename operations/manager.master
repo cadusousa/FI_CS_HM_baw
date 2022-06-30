@@ -1,0 +1,420 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="manager.master.cs" Inherits="admin" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BAW</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+<script type="text/javascript">
+    document.onkeydown = function (event) {
+        if (event.keyCode == 37 && event.altKey) {
+            return false;
+        }
+        if (event.keyCode == 39 && event.altKey) {
+            return false;
+        }
+        if (event.keyCode == 8 && event.target.localName == "body") {
+            return false;
+        }
+    }
+</script> 
+</head>
+
+<body onload="JavaScript:document.body.focus();" onkeydown="return showKeyCode(event)">
+<form id="form1" runat="server">
+<% UsuarioBean user = null;
+                            user = (UsuarioBean)Session["usuario"];%>
+	<div id="container">
+    	<div id="header">
+        	<!--<h2>AIMAR Administrador</h2>-->
+            <h2>BAW - Billing and Accounting Web</h2>
+            <div id="topmenu">
+            	<ul>
+                	<li><a href="../manager/manager.aspx">Administración</a></li>
+                    <li><a href="../invoice/index.aspx">Facturación</a></li>
+                    <li class="current"><a href="../operations/index.aspx">Operaciones</a></li>
+                    <li><a href="../reports/index.aspx">Reportes</a></li>
+                    <li><a href="../ventas/index.aspx">Ventas</a></li>
+                    <li><a href="../logout.aspx">Salir</a></li>
+                    <li><a href="../manager/countrychoice.aspx">Oficina</a></li>
+              </ul>
+            </div>
+            <div align="right"><h3><asp:Label ID="Label2" runat="server" ForeColor ="White" Text="Departamento"></asp:Label>&nbsp;&nbsp;<asp:DropDownList ID="lb_sucursal" 
+                    runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_sucursal_SelectedIndexChanged">
+                </asp:DropDownList>
+&nbsp; 
+    <asp:Label ID="l_contabilidad" runat="server" ForeColor ="White"  Text="Contabilidad"></asp:Label>&nbsp;&nbsp;<asp:DropDownList 
+                    ID="lb_contabilidad" runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_contabilidad_SelectedIndexChanged">
+                </asp:DropDownList>
+&nbsp;</h3>
+            <h3>
+            <br />
+                <asp:Label ID="Label1" runat="server" ForeColor="White" Text="TC:"></asp:Label>
+&nbsp;
+                <asp:Label ID="lbl_tipo_cambio" runat="server" ForeColor="White"></asp:Label>
+            </h3>
+            </div>
+        </div>
+        <div id="top-panel" 
+            style="font-weight: bold; font-style: italic; vertical-align: middle; text-align: right; color: #993400; font-size: 15px; text-transform: uppercase; text-decoration: underline overline;">
+                <%
+                UsuarioBean usuario = null;
+                usuario = (UsuarioBean)Session["usuario"];
+                lbl_nombre_sistema.Text = usuario.pais.Nombre_Sistema;
+                %>
+                <asp:Label ID="lbl_nombre_sistema" runat="server"></asp:Label>
+        </div>
+        <div id="wrapper">
+            <div id="content">
+                <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <div id="sidebar">
+  				<ul>
+                    <li><h3><a href="#" class="user">Usuario</a></h3>   
+                        <ul>
+                            <li><a href=""  class="arrow_right">UID.: <%= usuario.ID %></a></li>
+                            <li><a href=""  class="arrow_right">IP.: <%= Request.ServerVariables["REMOTE_ADDR"]%></a></li>
+                        </ul>
+                    </li>
+
+<%
+    
+    int admin = 0;
+    string trans_name = "";
+    int saldos = 0;
+
+
+    int P_contabilidad = 0, P_admin_series = 0, P_admin_whitelist = 0, P_bloqueo_periodo = 0, P_admin_rubros = 0, P_comisiones = 0, permiso_autorizar_creditos = 0, permiso_modificar_creditos = 0;
+    ArrayList Arr_Perfile = (ArrayList)DB.getPerfilesxUsu(user.ID, user.PaisID);
+    foreach (PerfilesBean Perfil in Arr_Perfile)
+    {
+        if ((Perfil.ID == 18) || (Perfil.ID == 8)) P_contabilidad = 1;
+
+        if ((Perfil.ID == 19) || (Perfil.ID == 7)) P_admin_series = 1;
+
+        if ((Perfil.ID == 20) || (Perfil.ID == 7)) P_admin_whitelist = 1;
+
+        if ((Perfil.ID == 21) || (Perfil.ID == 8)) P_bloqueo_periodo = 1;
+
+        if (Perfil.ID == 32 || (Perfil.ID == 7)) P_admin_rubros = 1;
+
+        if (Perfil.ID == 37 || Perfil.ID == 7 || Perfil.ID == 8)
+        {
+            admin = 1;
+            trans_name = Perfil.Nombre;
+        }
+
+        if (Perfil.ID == 26 || (Perfil.ID == 7)) P_comisiones = 1;
+
+        
+        if ((Perfil.ID == 8) || (Perfil.ID == 29) || (Perfil.ID == 7))
+        {
+            permiso_autorizar_creditos++;
+        }
+        if ((Perfil.ID == 8) || (Perfil.ID == 30) || (Perfil.ID == 7))
+        {
+            permiso_modificar_creditos++;
+        }        
+            
+    }
+
+    /*   
+    ArrayList Arr_Perfile = (ArrayList)DB.getPerfilesxUsu(user.ID, user.PaisID);
+    foreach (PerfilesBean Perfiles in Arr_Perfile) //Arr_Perfiles_Creditos)
+    {
+        //transmision exactus       spuer user          admin
+        if (Perfiles.ID == 37 || Perfiles.ID == 7 || Perfiles.ID == 8)
+        {                            
+            admin = 1;
+            trans_name = Perfiles.Nombre;
+        }
+    }    
+    */
+    ArrayList operacinbyuser = (ArrayList)DB.getOperacionbyUsu(user.ID, user.PaisID);                                    
+    foreach (RE_GenericBean rgb in operacinbyuser)
+    {
+        if (rgb.intC1 == 125 || admin == 1)                                             
+        {  
+            saldos = 1;
+        }
+    }
+            
+            if (saldos == 1 || admin == 1) {
+            %>                                
+                    <li><h3><a href="#" class="folder_table" style="background-color:yellow">Saldos</a></h3>
+                    <ul>
+                        <li><a href="saldos_transmision.aspx?op=1" class="search">Saldos Registrados</a></li>
+                        <!-- <li><a href="saldos_transmision.aspx?op=2" class="search">Detalle de Saldo</a></li> -->
+                        <li><a href="saldos_transmision.aspx?op=3" class="search">Saldos Transmitidos</a></li>
+                        <li><a href="saldos_transmision.aspx?op=4" class="search">Saldos Pendientes</a></li>
+                    </ul>
+                    </li>
+            <%          
+            }
+
+
+
+                      if (admin == 1)   {   
+                     %>
+
+                    <!-- 2020-10-14 -->
+  				    <li><h3><a href="#" class="folder_table"  style="background-color:yellow" title="Transmision de Registros Diarios a Exactus por Fecha">Transmision</a></h3>
+          				<ul>
+                            <li><a href="transmision_exactus.aspx" class="pagenew" title="Transmision de Registros Diarios a Exactus por Fecha">Transmision Exactus</a></li>            				
+                            <li><a href="transmision_exactus.aspx?reporte=1" class="search" title="Reporte Provisiones sin Factura">Provisiones Activas</a></li>            				
+                        </ul>
+                    </li>
+
+                     <%                           
+                    }                    
+ %>
+
+
+ 
+
+
+
+
+  				    <li><h3><a href="#" class="folder_table">Ordenes de compra</a></h3>
+          				<ul>
+                            <li><a href="genera_oc.aspx" class="useradd">Nueva Orden Compra</a></li>
+            				<li><a href="listado_oc.aspx" class="search">Lista Orden Compra</a></li>
+            				
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Proveedores</a></h3>
+          				<ul>
+                            <!-- <li><a href="../manager/addprov.aspx" class="useradd">Administrar proveedores</a></li> -->
+          				    <li><a href="recibo_factura.aspx" class="useradd">Recepcion de facturas</a></li>
+                            <li><a href="docsxpagaragentes.aspx" class="useradd">Generar SOA</a></li>
+                            <li><a href="docsxpagar.aspx" class="useradd">Modificar SOA</a></li>
+                            <li><a href="pagar_corte.aspx" class="useradd">Recibo SOA</a></li>
+                            <li><a href="search_pagar_corte.aspx" class="useradd">Buscar Recibo SOA</a></li>
+                            <li><a href="notadebitoprov.aspx" class="useradd">Nota de debito</a></li>
+                            <li><a href="searchND_proveedor.aspx" class="useradd">Buscar Nota de debito</a></li>
+                            <li><a href="provisioneslist_forNC.aspx" class="useradd">Nota credito provision</a></li>
+                            <li><a href="notacreditoprov_directo.aspx" class="useradd">Nota credito directa</a></li>
+                            <li><a href="searchNC_proveedor.aspx" class="useradd">Buscar Nota credito</a></li>
+                            <li><a href="ndlist_forNC.aspx" class="useradd"><font size="1">Nota Credito A Nota Debito</font></a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Provisiones</a></h3>
+          				<ul>
+          				    <li><a href="provisioneslist.aspx" class="useradd">Listado de provisiones</a></li>
+                            <li><a href="provisionagente.aspx" class="useradd">Provision manual</a></li>
+                            <li><a href="provisioneslist_forRT.aspx" class="useradd">Retenciones</a></li>
+                            <li><a href="provisioneslist_for_LC.aspx" class="useradd">Libro Compras</a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Contabilidad</a></h3>
+          				<ul>
+          				    <li><a href="cheques.aspx" class="useradd">Cheques</a></li>
+          				    <li><a href="cheques_search.aspx" class="useradd">Buscar cheques</a></li>
+          				    <li><a href="transferencias.aspx" class="useradd">Transferencias</a></li>
+          				    <li><a href="transferencias_search.aspx" class="useradd">Buscar Transferencias</a></li>
+          				    <li><a href="cajachica.aspx" class="useradd">Caja Chica</a></li>
+                            <li><a href="gastosdeviaje.aspx" class="useradd">Gastos de Viaje</a></li>
+                            <li><a href="ajustes.aspx" class="useradd">Ajustes Polizas</a></li>
+                            <li><a href="depositos.aspx" class="useradd">Ingresar Depositos</a></li>
+                            <li><a href="depositos_asociar.aspx" class="useradd">Asignar Depositos</a></li>
+                            <li><a href="notacredito_bancaria.aspx" class="useradd">Nota Credito Bancaria</a></li>
+                            <li><a href="notadebito_bancaria.aspx" class="useradd">Nota Debito Bancaria</a></li>
+                            <li><a href="movimiento_cuentas.aspx" class="useradd">Movimiento de Bancos</a></li>
+                            <li><a href="movimiento_contable.aspx" class="useradd">Movimiento de Cuentas</a></li>
+                            <li><a href="movimiento_cuentas_contables.aspx" class="useradd"><font size="1">Movimiento de Documentos</font></a></li>
+                            <li><a href="conciliaciones_bancarias.aspx" class="useradd">Conciliaciones</a></li>
+                            <li><a href="anticipos.aspx" class="useradd">Liquidacion Anticipos</a></li>
+                         </ul>                              
+                       </li>        
+                              
+  				        <li><h3><a href="#" class="folder_table">Intercompanys</a></h3>
+          				    <ul>
+                                <li><a href="transacciones_intercompanys.aspx" class="useradd">Intercompanys</a></li>                          
+                            </ul>
+                        </li>                              
+                               
+                              <% //ArrayList Arr_Perfile = (ArrayList)DB.getPerfilesxUsu(user.ID, user.PaisID);
+                           //foreach (PerfilesBean Perfiles in Arr_Perfile)
+                           //{
+                                //if ((Perfiles.ID == 26))
+                                
+                            if (P_comisiones == 1)  
+                            { %>
+
+  				            <li><h3><a href="#" class="folder_table" style="background-color:yellow" >Comisiones</a></h3>
+          				        <ul>
+                                    <li><a href="genera_comisiones.aspx" class="useradd">Comisiones</a></li>
+                                    <li><a href="pago_comision.aspx"  class="useradd">Pago Comisiones</a></li>
+                                </ul>
+                            </li>
+
+                              <% } %>
+
+
+                            <% //} %>
+
+            
+   
+                    <li>
+                        
+                        <% if (permiso_autorizar_creditos > 0 || permiso_modificar_creditos > 0) { %>
+                        <h3><a href="#" style="background-color:yellow" class="folder_table" >Clientes</a></h3>
+          				<% } %>
+
+                        <ul>
+                            <% //ArrayList Arr_Perfiles_Creditos = (ArrayList)DB.getPerfilesxUsu(user.ID, user.PaisID);
+
+                            /*foreach (PerfilesBean Perfiles in Arr_Perfile) //Arr_Perfiles_Creditos)
+                            {
+                                if ((Perfiles.ID == 8) || (Perfiles.ID == 29))
+                                {
+                                    permiso_autorizar_creditos++;
+                                }
+                                if ((Perfiles.ID == 8) || (Perfiles.ID == 30))
+                                {
+                                    permiso_modificar_creditos++;
+                                }
+                            }
+                             * */
+                            
+                            
+                            if (permiso_autorizar_creditos > 0)
+                            {%>
+                                <li><a href="creditospend.aspx" class="useradd">Autorizacion de creditos</a></li>    
+                            <%}
+                                
+                           if (permiso_modificar_creditos > 0)
+                            {%>
+                                <li><a href="modificacion_creditos.aspx" class="useradd">Modificacion de creditos</a></li>
+                            <%}%>
+                        </ul>
+                    </li>
+
+                      <!--
+                    <li><h3><a href="#" class="folder_table">Documentos</a></h3>
+                    <ul>
+                          -->
+                    <!--
+                    <li><a href="reactivar.aspx" class="useradd">Reactivar</a></li>
+                    -->
+                    <% 
+  
+
+                            if (P_contabilidad == 1) 
+                            {%>
+                            <li><h3><a href="#" style="background-color:yellow" class="folder_table">Contabilidad</a></h3>
+                                <ul>
+                                <li><a href="anulacion.aspx" class="useradd" >Anular</a></li>
+                                <li><a href="modificar.aspx" class="useradd" >Modificar</a></li>
+                                <li><a href="../operations/unificador.aspx" class="pagenew">Unificar</a></li>
+                                <li><a href="cambio_fechas.aspx" class="useradd" >Cambio de Fechas</a></li>   
+                            </ul>
+                            </li> 
+                            <%}
+                                                    
+                            if (P_admin_series == 1)  
+                            {%>
+
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Admin Series</a></h3>
+                                <ul>
+                                <li><a href="../operations/searchsuc.aspx" class="pagenew">Admin Series</a></li>  
+                                </ul>
+                            </li>
+
+                            <%}
+                                                    
+                            if (P_admin_whitelist == 1)  
+                            {%>
+
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Admin Whitelist</a></h3>
+                                <ul>
+                                <li><a href="White_list.aspx" class="useradd">Admin WhiteList</a></li>  
+                                </ul>
+                            </li>
+
+
+                            <%} 
+                                                   
+                            if (P_bloqueo_periodo == 1)  
+                            {%>
+
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Bloqueo</a></h3>
+                                <ul>
+                                <li><a href="bloqueoperiodo.aspx" class="useradd" >Cierres Contables</a></li>
+                                </ul>
+                            </li>
+
+                            <%}
+                                                                 
+                            if (P_admin_rubros == 1)   
+                            {%>
+                        
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Cuenta Contable</a></h3>
+                                <ul>
+                                    <li><a href="addcta.aspx" class="pagenew">Crear cuenta contable</a></li>
+                                    <li><a href="searchcta.aspx" class="search">Buscar cuenta contable</a></li>
+                                </ul>
+                            </li>                       
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Rubros Master</a></h3>
+                                <ul>
+                                <li><a href="administrar_rubros.aspx" class="pagenew" >Admin Rubros Master</a></li>
+                                </ul>
+                            </li>
+
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Rubros Baw</a></h3>
+                                <ul>
+                        	        <li><a href="../manager/addrubro.aspx" class="pagenew">Crear rubro</a></li>
+                                    <li><a href="../manager/searchrubro.aspx" class="search">Buscar rubro</a></li>
+                                </ul>
+                            </li>
+                            <%}                  
+                      
+                      %>
+                    </ul>
+                    </li>
+
+
+
+				</ul>       
+          </div>
+      </div>
+        <div id="footer">
+        <div id="credits">
+   		Elaborado por AIMAR, S.A.
+        </div>
+        <div id="styleswitcher">
+            <ul>
+                <li><a href="javascript: document.cookie='theme='; window.location.reload();" title="Default" id="defswitch">d</a></li>
+                <li><a href="javascript: document.cookie='theme=1'; window.location.reload();" title="Blue" id="blueswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=2'; window.location.reload();" title="Green" id="greenswitch">g</a></li>
+                <li><a href="javascript: document.cookie='theme=3'; window.location.reload();" title="Brown" id="brownswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=4'; window.location.reload();" title="Mix" id="mixswitch">m</a></li>
+            </ul>
+        </div><br />
+
+        </div>
+</div>
+</form>
+</body>
+</html>
+
