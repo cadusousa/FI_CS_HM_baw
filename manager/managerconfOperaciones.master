@@ -1,0 +1,77 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="managerconfOperaciones.master.cs" Inherits="admin" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>AIMAR::::</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+</head>
+
+<body>
+<form id="form1" runat="server">
+	<div id="container">
+    	<div id="header">
+        	<h2>AIMAR Administrator</h2>
+            <div id="topmenu">
+            	<ul>
+                	<li class="current"><a href="../manager/manager.aspx">Administración</a></li>
+                    <li><a href="../invoice/index.aspx">Facturación</a></li>
+                    <li><a href="../operations/index.aspx">Operaciones</a></li>
+                    <li><a href="../reports/index.aspx">Reportes</a></li>
+              </ul>
+            </div>
+        </div>
+        <div align="right"><h3>Contabilidad&nbsp;&nbsp;<asp:DropDownList 
+                    ID="lb_contabilidad" runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_contabilidad_SelectedIndexChanged">
+                </asp:DropDownList>
+&nbsp;</h3></div>
+        <div id="top-panel">
+            <!--- <div id="panel">
+                <ul>
+					<li><a href="adduser.aspx" class="useradd">Agregar usuario</a></li>                        
+            		<li><a href="search.aspx" class="search">Buscar</a></li>
+                </ul>
+            </div> --->
+        </div>
+        <div id="wrapper">
+            <div id="content">
+                <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            
+      </div>
+        <div id="footer">
+        <div id="credits">
+   		Elaborado por Miguel Angel Alvarado Teni Guatemala C.A.
+        </div>
+        <div id="styleswitcher">
+            <ul>
+                <li><a href="javascript: document.cookie='theme='; window.location.reload();" title="Default" id="defswitch">d</a></li>
+                <li><a href="javascript: document.cookie='theme=1'; window.location.reload();" title="Blue" id="blueswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=2'; window.location.reload();" title="Green" id="greenswitch">g</a></li>
+                <li><a href="javascript: document.cookie='theme=3'; window.location.reload();" title="Brown" id="brownswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=4'; window.location.reload();" title="Mix" id="mixswitch">m</a></li>
+            </ul>
+        </div><br />
+
+        </div>
+</div>
+</form>
+</body>
+</html>
+

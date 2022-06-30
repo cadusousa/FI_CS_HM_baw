@@ -1,0 +1,488 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="manager.master.cs" Inherits="admin" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BAW</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+<script type="text/javascript">
+var version = navigator.appVersion; 
+function showKeyCode(e)
+{
+    var keycode =(window.event) ? event.keyCode : e.keyCode;
+
+    if ((version.indexOf('MSIE') != -1))   {
+        if(keycode == 116)
+        {
+            event.keyCode = 0;
+            event.returnValue = false;
+            return false;
+        }
+    }
+    else
+    {   
+        if(keycode == 116)
+        {
+            return false;
+        }
+    }
+} 
+</script>
+</head>
+
+<body onload="JavaScript:document.body.focus();" onkeydown="return showKeyCode(event)">
+<form id="form1" runat="server">
+	<div id="container">
+    	<div id="header">
+        	<h2>BAW - Billing and Accounting Web</h2>
+            <div id="topmenu">
+            	<ul>
+                	<li class="current"><a href="../manager/manager.aspx">Administración</a></li>
+                    <li><a href="../invoice/index.aspx">Facturación</a></li>
+                    <li><a href="../operations/index.aspx">Operaciones</a></li>
+                    <li><a href="../reports/index.aspx">Reportes</a></li>
+                    <li><a href="../ventas/index.aspx">Ventas</a></li>
+                    <li><a href="../logout.aspx">Salir</a></li>
+                    <li><a href="../manager/countrychoice.aspx">Oficina</a></li>
+              </ul>
+            </div>
+        </div>
+        <div align="right"><h3><asp:Label ID="l_contabilidad" ForeColor="White" runat="server" Text="Contabilidad"></asp:Label>&nbsp;&nbsp;<asp:DropDownList 
+                    ID="lb_contabilidad" runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_contabilidad_SelectedIndexChanged">
+                </asp:DropDownList>
+&nbsp;</h3>
+        <h3>
+            <br />
+                <asp:Label ID="Label1" runat="server" ForeColor="White" Text="TC:"></asp:Label>
+&nbsp;
+                <asp:Label ID="lbl_tipo_cambio" runat="server" ForeColor="White"></asp:Label>
+            </h3>
+        </div>
+        <div id="top-panel" 
+            
+            style="font-weight: bold; font-style: italic; vertical-align: middle; text-align: right; color: #993400; font-size: 15px; text-transform: uppercase; text-decoration: underline overline;">
+                <%
+                UsuarioBean usuario = null;
+                usuario = (UsuarioBean)Session["usuario"];
+                lbl_nombre_sistema.Text = usuario.pais.Nombre_Sistema;
+      
+                    ArrayList Arr_Perfile = (ArrayList)DB.getPerfilesxUsu(usuario.ID, usuario.PaisID);
+ 
+                %>
+                <asp:Label ID="lbl_nombre_sistema" runat="server"></asp:Label>
+        </div>
+        <div id="wrapper">
+            <div id="content">
+                <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <div id="sidebar">
+  				<ul>
+
+
+<%
+    
+    
+    int P_nuevo_menu = 0, P_contabilidad = 0, P_admin_series = 0, P_admin_whitelist = 0, P_bloqueo_periodo = 0, P_admin_rubros = 0, P_admin_users = 0, P_admin_restricciones = 0, P_fact_electronica = 0, P_tipo_cambio = 0, P_admin_retencion = 0, P_tipo_servicios = 0, P_conta_auto = 0, P_admin_pais = 0;
+    //ArrayList Arr_Perfiles = (ArrayList)DB.getPerfilesxUsu(user.ID, user.PaisID);
+    foreach (PerfilesBean Perfil in Arr_Perfile)
+    {
+        if ((Perfil.ID == 18) || (Perfil.ID == 8)) P_contabilidad = 1;
+
+        if ((Perfil.ID == 19) || (Perfil.ID == 7)) { P_admin_series = 1; P_nuevo_menu = 1; }
+
+        if ((Perfil.ID == 20) || (Perfil.ID == 7)) { P_admin_whitelist = 1; P_nuevo_menu = 1; }
+
+        if ((Perfil.ID == 21) || (Perfil.ID == 8)) P_bloqueo_periodo = 1;
+
+        if (Perfil.ID == 32 || (Perfil.ID == 7)) { P_admin_rubros = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 39 || (Perfil.ID == 7)) { P_admin_users = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 40 || (Perfil.ID == 7)) {P_admin_restricciones = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 44 || (Perfil.ID == 7)) P_fact_electronica = 1;
+
+        if (Perfil.ID == 38 || (Perfil.ID == 7)) { P_tipo_cambio = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 41 || (Perfil.ID == 7)) { P_admin_retencion = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 45 || (Perfil.ID == 7)) P_conta_auto = 1;
+
+        if (Perfil.ID == 46 || (Perfil.ID == 7)) { P_admin_pais = 1; P_nuevo_menu = 1; }
+
+        if (Perfil.ID == 22 || (Perfil.ID == 7)) P_tipo_servicios = 1;
+
+    }
+        
+    
+    
+            if (P_admin_users == 1)
+            {
+            %>
+
+
+
+  				    <li><h3><a href="#" style="background-color:yellow" class="user">Usuarios</a></h3>
+          				<ul>
+                            <li><a href="adduser.aspx" class="useradd">Configurar usuario</a></li>
+                            <li><a href="Confconta.aspx" class="useradd">Configurar Contabilidad</a></li>
+                        </ul>
+                    </li>
+
+                    <li><h3><a href="#" class="manage_profile" style="background-color:yellow">Perfiles</a></h3>
+          				<ul>
+                            <li><a href="addprofile.aspx" class="addprofile">Crear perfil</a></li>
+                            <li><a href="searchprofile.aspx" class="search">Buscar perfil</a></li>                            
+                        </ul>
+                    </li>
+
+
+            <% 
+            }  
+                                                          
+            %>
+
+
+
+
+                    <li><h3><a href="#" class="folder_table">Bancos</a></h3>
+          				<ul>
+                            <li><a href="addbanco.aspx" class="useradd">Agregar Bancos</a></li>
+                            <li><a href="searchbanco.aspx" class="useradd">Buscar Bancos</a></li>
+                        </ul>
+                    </li>
+
+                    <li><h3><a href="#" class="house">Sucursales</a></h3>
+                        <ul>
+                        	<li><a href="addsuc.aspx" class="addsucursal">Crear sucursal</a></li>
+                            <li><a href="searchsuc.aspx" class="search">Buscar sucursal</a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="house">Departamentos</a></h3>
+                        <ul>
+                        	<li><a href="adddepartamento.aspx" class="addsucursal">Crear Departamento</a></li>
+                            <li><a href="searchdepartamento.aspx" class="search">Buscar Departamento</a></li>
+                            <li><a href="activacion_restricciones.aspx" class="addprofile">Restricciones</a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="house">Grupos</a></h3>
+                        <ul>
+                        	<li><a href="addgroup.aspx" class="addsucursal">Crear Grupo</a></li>
+                            <li><a href="searchgroup.aspx" class="search">Consultar Grupos</a></li>
+                            <li><a href="asignar_grupo.aspx" class="addprofile">Asignar Grupo</a></li>
+                        </ul>
+                    </li>
+                      <!--
+                    <li><h3><a href="#" class="folder_table">Cuentas contables</a></h3>
+                        <ul>
+                        	<li><a href="addcta.aspx" class="pagenew">Crear cuenta contable</a></li>
+                            <li><a href="searchcta.aspx" class="search">Buscar cuenta contable</a></li>
+                        </ul>
+                    </li>
+                      -->
+<% /*
+        if (P_admin_rubros == 1) {
+    
+% >
+
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Rubros Baw</a></h3>
+                        <ul>
+                        	<li><a href="addrubro.aspx" class="pagenew">Crear rubro</a></li>
+                            <li><a href="searchrubro.aspx" class="search">Buscar rubro</a></li>
+                        </ul>
+                    </li>
+
+
+<%      } */
+
+
+                                                             
+                            %>
+         
+
+
+                            <li><a href="permisos_serie.aspx" class="pagenew">Asignar Series</a></li>
+                            <li><a href="conf_comisiones.aspx" class="pagenew">Comisiones</a></li>
+
+                    <li><h3><a href="#" class="folder_table">Pago por Agentes</a></h3>
+                        <ul>
+                            <li><a href="configurar_agente_aduanero.aspx" class="pagenew">Configurar Pagos</a></li>
+                        </ul>
+                    </li>
+                   
+
+                    <!--
+                    <li><h3><a href="#" class="folder_table">Impresoras</a></h3>
+                        <ul>
+                            <li><a href="addprinter.aspx" class="pagenew">Agregar Impresora</a></li>
+                        	<li><a href="assignprinter.aspx" class="pagenew">Asignar Impresora</a></li>
+                        </ul>
+                    </li>
+                  
+                        
+                    //user = (UsuarioBean)Session["usuario"];
+                    //        if ((user.ID == "soporte2"))
+                      -->
+
+                    <li><h3><a href="#" class="folder_table">Aut. de Servicios</a></h3>
+                    <ul>
+                        <li><a href="configurar_automatizacion_servicios.aspx" class="pagenew">Configurar</a></li>
+                    </ul>
+                    <li><h3><a href="#" class="folder_table">Aut. Intercompanys</a></h3>
+                    <ul>
+                        <li><a href="configurar_intercompany_administrativo.aspx" class="pagenew">Administrativo</a></li>
+                        <li><a href="configurar_intercompany_operativo.aspx" class="pagenew">Operativo</a></li>
+                    </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Conf. de Seguros</a></h3>
+                    <ul>
+                        <li><a href="contabilizacion_seguros.aspx" class="pagenew">Configurar</a></li>
+                    </ul>
+
+
+	<%
+                            if (P_admin_users == 1)
+                            {
+                            %>
+
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Admin usuario</a></h3>
+                        <ul>
+                            <li><a href="adduser.aspx"  class="useradd">Admin usuario</a></li>
+                        </ul>
+                    </li>
+                            <% 
+                            }  
+                                                      
+                          
+                            //if ((Perfil.ID == 19) || (Perfil.ID == 7))
+                            
+                            if (P_admin_series == 1)
+                            {
+                            %>
+
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Admin Series</a></h3>
+                        <ul>
+                            <li><a href="../operations/searchsuc.aspx" class="pagenew">Admin Series</a></li>
+                        </ul>
+                    </li>
+    
+                            <% 
+                            }
+                                
+                                                                                                            
+                            //if ((Perfil.ID == 20) || (Perfil.ID == 7))
+                            
+                            if (P_admin_whitelist == 1)
+                            {
+                            %>
+
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Admin Whitelist</a></h3>
+                        <ul>
+                           <li><a href="../operations/White_list.aspx"  class="pagenew">Admin Whitelist</a></li>
+                        </ul>
+                    </li>
+ 
+                            <% 
+                            }      
+                            
+                            
+                            //if ((Perfil.ID == 38) || (Perfil.ID == 7))
+                            
+                            if (P_tipo_cambio == 1)
+                            {
+                            %>
+
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Tipo Cambio</a></h3>
+                        <ul>
+                            <li><a href="tipocambio_manual.aspx?id=<%=usuario.PaisID%>&accion=1"  class="pagenew">Tipo Cambio</a></li>
+                        </ul>
+                    </li>
+                            <% 
+                            }    
+
+                           
+                            
+                          
+%>
+
+                        <%
+                                    
+                            //if (Perfil.ID == 32 || (Perfil.ID == 7))
+                            
+                            /*if (P_admin_rubros == 1)
+                            {% >
+                                <li><h3><a href="#" style="background-color:yellow" class="house">Rubros</a></h3>
+                                    <ul>
+                                        <li><a href="../operations/addcta.aspx" class="pagenew">Crear cuenta contable</a></li>
+                                        <li><a href="../operations/searchcta.aspx" class="search">Buscar cuenta contable</a></li>
+                                        <li><a href="../operations/administrar_rubros.aspx" class="pagenew">Rubros Master</a></li>
+                                    </ul>
+                                </li>
+                            <%}*/
+                            
+                            
+                            if (P_admin_pais == 1) {
+                            %>
+                                <li><h3><a href="#" style="background-color:yellow" class="house">Paises</a></h3>
+                                    <ul>
+                        	            <li><a href="addpais.aspx" class="addsucursal">Crear Pais</a></li>
+                                        <li><a href="searchpais.aspx" class="search">Buscar Pais</a></li>
+                                    </ul>
+                                </li>
+
+                            <% } 
+
+
+
+                            if (P_admin_rubros == 1)   
+                            {%>
+                        
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Cuenta Contable</a></h3>
+                                <ul>
+                                    <li><a href="../operations/addcta.aspx" class="pagenew">Crear cuenta contable</a></li>
+                                    <li><a href="../operations/searchcta.aspx" class="search">Buscar&nbsp;cuenta&nbsp;contable</a></li>
+                                </ul>
+                            </li>                       
+
+                            <%}  
+                                                       
+
+                    if (P_tipo_servicios == 1)
+                    {%>
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Tipos de Servicio</a></h3>
+                        <ul>
+                            <li><a href="administracion_tipos_servicio.aspx" class="pagenew">Asignar</a></li>
+                        </ul>
+                    </li>
+                    <%}
+                      
+
+                            if (P_admin_rubros == 1)   
+                            {%>
+                     
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Rubros Master</a></h3>
+                                <ul>
+                                <li><a href="../operations/administrar_rubros.aspx" class="pagenew" >Admin Rubros Master</a></li>
+                                </ul>
+                            </li>
+
+
+                            <li><h3><a href="#" class="folder_table" style="background-color:yellow">Rubros Baw</a></h3>
+                                <ul>
+                        	        <li><a href="addrubro.aspx" class="pagenew">Crear rubro</a></li>
+                                    <li><a href="searchrubro.aspx" class="search">Buscar rubro</a></li>
+                                </ul>
+                            </li>
+                            <%}  %>
+        
+
+
+
+<%
+
+    if (P_admin_retencion == 1) {
+        
+        %>
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Retenciones</a></h3>
+                        <ul>
+                            <li><a href="Retencion.aspx" class="pagenew">Admin Retencion</a></li>
+                        	<li><a href="plantillaRetencion.aspx" class="pagenew">Crear Plantilla</a></li>    
+                            <li><a href="admin_retencion.aspx"  class="pagenew">Admin % Retencion</a></li>
+                        </ul>
+                    </li>
+
+<%      } %>
+
+                            
+                            <%
+                                
+                        if (P_admin_restricciones == 1)
+                        {
+                            %>
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">Restricciones</a></h3>
+                        <ul>
+
+                            <li><a href="restricciones.aspx" class="pagenew">Admin Restricciones</a></li>
+                        </ul>
+                    </li>
+
+                            <% 
+                        }
+
+
+ 
+                    
+                    //UsuarioBean user = null;
+                    //        user = (UsuarioBean)Session["usuario"];
+                    //        if ((user.ID == "soporte2"))
+                    
+                    if (P_fact_electronica == 1)
+                    {
+                        %>
+                    <li><h3><a href="#" style="background-color:yellow" class="folder_table">FA. Electronica</a></h3>
+                        <ul>
+                            <li><a href="configurar_documento_electronico.aspx" class="pagenew">Configurar</a></li>
+                        </ul>
+                    </li>
+
+                    <%}
+
+
+
+                      
+                      %>                    
+
+                    <%
+                    //user = (UsuarioBean)Session["usuario"];
+                    //if ((user.ID == "soporte2"))
+                    
+                    if (P_conta_auto == 1)
+                    {%>
+                    <li><h3><a href="#" style="background-color:yellow"  class="folder_table">Conta Automatica</a></h3>
+                        <ul>
+                            <!--
+                            <li><a href="configurar_contabilizacion.aspx" class="pagenew">Configurar</a></li>
+                            -->
+                            <li><a href="index_contabilizacion_automatica.aspx" class="pagenew">Configurar</a></li>
+                        </ul>
+                    </li>
+                    <%}%>
+
+				</ul>       
+          </div>
+      </div>
+        <div id="footer">
+        <div id="credits">
+            Elaborado por AIMAR, S.A.
+        </div>
+        <div id="styleswitcher">
+            <ul>
+                <li><a href="javascript: document.cookie='theme='; window.location.reload();" title="Default" id="defswitch">d</a></li>
+                <li><a href="javascript: document.cookie='theme=1'; window.location.reload();" title="Blue" id="blueswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=2'; window.location.reload();" title="Green" id="greenswitch">g</a></li>
+                <li><a href="javascript: document.cookie='theme=3'; window.location.reload();" title="Brown" id="brownswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=4'; window.location.reload();" title="Mix" id="mixswitch">m</a></li>
+            </ul>
+        </div><br />
+
+        </div>
+</div>
+</form>
+</body>
+</html>
+
