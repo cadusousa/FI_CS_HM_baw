@@ -1,0 +1,257 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="manager.master.cs" Inherits="Reports_manager" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BAW</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+<script type="text/javascript">
+var version = navigator.appVersion; 
+function showKeyCode(e)
+{
+    var keycode =(window.event) ? event.keyCode : e.keyCode;
+
+    if ((version.indexOf('MSIE') != -1))   {
+        if(keycode == 116)
+        {
+            event.keyCode = 0;
+            event.returnValue = false;
+            return false;
+        }
+    }
+    else
+    {   
+        if(keycode == 116)
+        {
+            return false;
+        }
+    }
+} 
+var message="Función Desactivada!";
+function clickIE4()
+{
+    if (event.button==2)
+    {
+        alert(message);
+        return false;
+    }
+}
+function clickNS4(e)
+{
+    if (document.layers||document.getElementById&&!document.all)
+    {
+        if (e.which==2||e.which==3)
+        {
+            alert(message);
+            return false;
+        }
+    }
+}
+if (document.layers)
+{
+    document.captureEvents(Event.MOUSEDOWN);
+    document.onmousedown=clickNS4;
+}
+else if (document.all&&!document.getElementById)
+{
+    document.onmousedown=clickIE4;
+}
+document.oncontextmenu=new Function("alert(message);return false" );
+</script>
+</head>
+
+<body onload="JavaScript:document.body.focus();" onkeydown="return showKeyCode(event)">
+	<form id="form1" runat="server">
+	<div id="container">
+    	<div id="header">
+            <h2>BAW - Billing and Accounting Web</h2>
+            <div id="topmenu">
+            	<ul>
+                	<li><a href="../manager/manager.aspx">Administración</a></li>
+                    <li><a href="../invoice/index.aspx">Facturación</a></li>
+                    <li><a href="../operations/index.aspx">Operaciones</a></li>
+                    <li class="current"><a href="../reports/index.aspx">Reportes</a></li>
+                    <li><a href="../ventas/index.aspx">Ventas</a></li>
+                    <li><a href="../logout.aspx">Salir</a></li>
+                    <li><a href="../manager/countrychoice.aspx">Oficina</a></li>
+                </ul>
+            </div>
+            <div align="right"><h3><asp:Label ID="Label2" runat="server" ForeColor ="White" Text="Departamento"></asp:Label>&nbsp;&nbsp;<asp:DropDownList ID="lb_sucursal" 
+                    runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_sucursal_SelectedIndexChanged">
+                </asp:DropDownList>
+                &nbsp;
+                <asp:Label ID="l_contabilidad" runat="server" ForeColor ="White"  Text="Contabilidad"></asp:Label>&nbsp;&nbsp;<asp:DropDownList 
+                    ID="lb_contabilidad" runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_contabilidad_SelectedIndexChanged">
+                </asp:DropDownList>
+                &nbsp;</h3>
+                <h3>
+            <br />
+                <asp:Label ID="Label1" runat="server" ForeColor="White" Text="TC:"></asp:Label>
+                    &nbsp;
+                <asp:Label ID="lbl_tipo_cambio" runat="server" ForeColor="White"></asp:Label>
+            </h3>
+                </div>
+        </div>
+        <div id="top-panel" 
+            style="font-weight: bold; font-style: italic; vertical-align: middle; text-align: right; color: #993400; font-size: 15px; text-transform: uppercase; text-decoration: underline overline;">
+                <%
+                UsuarioBean usuario = null;
+                usuario = (UsuarioBean)Session["usuario"];
+                lbl_nombre_sistema.Text = usuario.pais.Nombre_Sistema;
+                ArrayList Arr_Perfiles = (ArrayList)DB.getPerfilesxUsu(usuario.ID, usuario.PaisID);
+                %>
+
+                <asp:Label ID="lbl_nombre_sistema" runat="server"></asp:Label>
+        </div>
+        <div id="wrapper">
+            <div id="content">
+                <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <div id="sidebar">
+  				<ul>
+                    <li><h3><a href="#" class="user">Usuario</a></h3>   
+                        <ul>
+                            <li><a href=""  class="arrow_right">UID.: <%= usuario.ID %></a></li>
+                            <li><a href=""  class="arrow_right">IP.: <%= Request.ServerVariables["REMOTE_ADDR"]%></a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Reportes</a></h3>
+                        <%
+                            int ban_reporte_general = 0;//Administracion, Reporte General, Contabilidad
+                            int ban_reporte_operativo = 0;//Reporte Operativo
+                            int ban_reporte_consultas = 0;
+                            foreach (PerfilesBean Perfil in Arr_Perfiles)
+                            {
+                                if ((Perfil.ID == 8) || (Perfil.ID == 18) || (Perfil.ID == 27))
+                                {
+                                    ban_reporte_general++;
+                                }
+                                else if (Perfil.ID == 25)
+                                {
+                                    ban_reporte_operativo++; 
+                                }
+                                else if (Perfil.ID == 33)
+                                {
+                                    ban_reporte_consultas++;
+                                }
+                            }
+                            if (((ban_reporte_general > 0) && (ban_reporte_operativo == 0)) || ((ban_reporte_general > 0) && (ban_reporte_operativo > 0))) //Reporte General
+                            {%>
+                            <ul>
+                                <li><a href="../Reports/Asistelibros.aspx" class="pagenew">Asistelibros</a></li>
+                                <li><a href="../Reports/solicitaReport.aspx" class="pagenew">Libro diario</a></li>
+                                <li><a href="../Reports/solicitaReport.aspx?tipo=2" class="pagenew">Libro mayor</a></li>
+                                <li><a href="../Reports/profitresumido.aspx" class="pagenew">Profit Resumido</a></li>
+                                <li><a href="../Reports/profit2.aspx" class="pagenew">Profit Detallado</a></li>
+                                <li><a href="../Reports/SolicitaBS.aspx" class="pagenew">Balance de Saldos</a></li>
+                                <li><a href="../Reports/SolicitaBG.aspx" class="pagenew">Balance General</a></li>
+                                <li><a href="../Reports/SolicitaER.aspx" class="pagenew">Estado Resultados</a></li>
+                                <li><a href="../Reports/solicitaEC.aspx" class="pagenew">Reporte de SOA</a></li>
+                                <li><a href="../Reports/estadocuentacliente.aspx" class="pagenew">Estados de Cuenta</a></li>
+                                <li><a href="../Reports/AntiguedadSaldos.aspx" class="pagenew">Antiguedad de Saldos</a></li>
+                                <li><a href="../Reports/Solicita_Compras.aspx" class="pagenew">Libro de Compras</a></li>
+                                <li><a href="../Reports/Solicita_Ventas.aspx" class="pagenew">Libro de Ventas</a></li>
+                                <li><a href="../Reports/Solicita_Retenciones.aspx" class="pagenew">Reporte de Retenciones</a></li>
+                                <li><a href="../Reports/Recibos.aspx" class="pagenew">Reporte de Recibos</a></li>
+                                <li><a href="../Reports/SolicitaBS_Clientes.aspx" class="pagenew">Balance Docs X Cobrar</a></li>
+                                <li><a href="../Reports/SolicitaBS_Proveedores.aspx" class="pagenew">Balance Docs X Pagar</a></li>
+                                <li><a href="../Reports/Cuentas_por_Pagar.aspx" class="pagenew">Cuentas X Pagar</a></li>
+                                <%
+                                int permiso_autorizar = 0;
+                                foreach (PerfilesBean Perfil in Arr_Perfiles)
+                                {
+                                    if (Perfil.ID == 31)
+                                    {
+                                        permiso_autorizar++;
+                                    }
+                                }
+                                if (permiso_autorizar > 0)
+                                {
+                                %>
+                                    <li><a href="../Reports/Creditos_Clientes.aspx" class="pagenew">Creditos Clientes</a></li>
+                                <%
+                                }
+                                if (usuario.PaisID == 5)
+                                  {%>
+                                    <li><a href="../Reports/Solicita_D151.aspx" class="pagenew">D151</a></li>
+                                <%} %>
+                                <li><a href="../Reports/Solicita_Liquidaciones.aspx" class="pagenew">Liquidaciones</a></li>
+                                <li><a href="../Reports/nofacturado.aspx" class="pagenew">Cargos no Facturados</a></li>                     
+                                <li><a href="../Reports/solicita_depositos.aspx" class="pagenew">Depositos pendientes</a></li>                     
+                                <li><a href="../Reports/solicita_routing_fact.aspx" class="pagenew">Routing Facturados</a></li>     
+                                <li><a href="../Reports/solicita_ro_no_fact.aspx" class="pagenew">Routing no Facturados</a></li> 
+                                <li><a href="../Reports/ro_noasociados.aspx" class="pagenew">Routing no ligados</a></li>
+                                <li><a href="../Reports/integracion_bancaria.aspx" class="pagenew">Integracion Bancaria</a></li>
+                                <li><a href="../Reports/Soa_regional.aspx" class="pagenew">SOA Regional</a></li>
+                            </ul>
+                          <%}
+                            else if ((ban_reporte_general == 0) && (ban_reporte_operativo == 1))//Reporte Operativo
+                            {%> 
+                            <ul>
+                                <li><a href="../Reports/solicitaEC.aspx" class="pagenew">Reporte de SOA</a></li>
+                                <li><a href="../Reports/estadocuentacliente.aspx" class="pagenew">Estados de Cuenta</a></li>
+                                <li><a href="../Reports/AntiguedadSaldos.aspx" class="pagenew">Antiguedad de Saldos</a></li>
+                                <li><a href="../Reports/Recibos.aspx" class="pagenew">Reporte de Recibos</a></li>
+                                <li><a href="../Reports/Solicita_Ventas.aspx" class="pagenew">Libro de Ventas</a></li>
+                                <li><a href="../Reports/profitresumido.aspx" class="pagenew">Profit Resumido</a></li>
+                                <li><a href="../Reports/profit2.aspx" class="pagenew">Profit Detallado</a></li>
+                                <li><a href="../Reports/nofacturado.aspx" class="pagenew">Cargos no Facturados</a></li> 
+                                <li><a href="../Reports/solicita_routing_fact.aspx" class="pagenew">Routing Facturados</a></li>
+                                <li><a href="../Reports/solicita_ro_no_fact.aspx" class="pagenew">Routing no Facturados</a></li>
+                                <li><a href="../Reports/ro_noasociados.aspx" class="pagenew">Routing no ligados</a></li>
+                                <li><a href="../Reports/Soa_regional.aspx" class="pagenew">SOA Regional</a></li>
+                                
+                          </ul>
+                          <%}
+                            else if ((ban_reporte_consultas > 0) && (ban_reporte_operativo == 0) && (ban_reporte_general == 0))//Reporte Operativo
+                            {
+                        %>
+                            <ul>
+                                <li><a href="../Reports/estadocuentacliente.aspx" class="pagenew">Estados de Cuenta</a></li>
+                                <li><a href="../Reports/AntiguedadSaldos.aspx" class="pagenew">Antiguedad de Saldos</a></li>
+                            </ul>
+                        <% 
+                          }%>
+                    </li>
+                </ul>
+          </div>
+      </div>
+        <div id="footer">
+        <div id="credits">
+   		    Elaborado por AIMAR, S.A.
+        </div>
+        <div id="styleswitcher">
+            <ul>
+                <li><a href="javascript: document.cookie='theme='; window.location.reload();" title="Default" id="defswitch">
+                    d</a></li>
+                <li><a href="javascript: document.cookie='theme=1'; window.location.reload();" title="Blue" id="blueswitch">
+                    b</a></li>
+                <li><a href="javascript: document.cookie='theme=2'; window.location.reload();" title="Green" id="greenswitch">
+                    g</a></li>
+                <li><a href="javascript: document.cookie='theme=3'; window.location.reload();" title="Brown" id="brownswitch">
+                    b</a></li>
+                <li><a href="javascript: document.cookie='theme=4'; window.location.reload();" title="Mix" id="mixswitch">
+                    m</a></li>
+            </ul>
+        </div><br />
+
+        </div>
+</div>
+    </form>
+</body>
+</html>
