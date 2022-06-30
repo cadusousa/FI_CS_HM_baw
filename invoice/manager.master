@@ -1,0 +1,234 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="manager.master.cs" Inherits="invoice_manager" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>BAW</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript">
+    var idTheme = document.cookie.split(';')[0].charAt(6);
+    if (idTheme == ";" || idTheme == "=") {
+        idTheme = "";
+    }
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "../css/theme" + idTheme + ".css";
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+<script type="text/javascript">
+var version = navigator.appVersion; 
+function showKeyCode(e)
+{
+    var keycode =(window.event) ? event.keyCode : e.keyCode;
+
+    if ((version.indexOf('MSIE') != -1))   {
+        if(keycode == 116)
+        {
+            event.keyCode = 0;
+            event.returnValue = false;
+            return false;
+        }
+    }
+    else
+    {   
+        if(keycode == 116)
+        {
+            return false;
+        }
+    }
+} 
+var message="Función Desactivada!";
+function clickIE4()
+{
+    if (event.button==2)
+    {
+        alert(message);
+        return false;
+    }
+}
+function clickNS4(e)
+{
+    if (document.layers||document.getElementById&&!document.all)
+    {
+        if (e.which==2||e.which==3)
+        {
+            alert(message);
+            return false;
+        }
+    }
+}
+if (document.layers)
+{
+    document.captureEvents(Event.MOUSEDOWN);
+    document.onmousedown=clickNS4;
+}
+else if (document.all&&!document.getElementById)
+{
+    document.onmousedown=clickIE4;
+}
+document.oncontextmenu=new Function("alert(message);return false" );
+ 
+</script>
+<script type="text/javascript">
+    document.onkeydown = function () {
+        if (event.keyCode == 37 && event.altKey) {
+            return false;
+        }
+        if (event.keyCode == 39 && event.altKey) {
+            return false;
+        }
+    } 
+</script> 
+<style type="text/css">
+    .Grupo_Empresas
+    {
+        margin-top:40px;
+    }
+</style>
+</head>
+
+<body onload="JavaScript:document.body.focus();" onkeydown="return showKeyCode(event)">
+	<form id="form1" runat="server">
+	<div id="container">
+    	<div id="header">
+        	<!--<h2>AIMAR Administrator</h2>-->
+            <h2>BAW - Billing and Accounting Web</h2>
+            <div id="topmenu">
+            	<ul>
+                	<li><a href="../manager/manager.aspx">Administración</a></li>
+                    <li class="current"><a href="../invoice/index.aspx">Facturación</a></li>
+                    <li><a href="../operations/index.aspx">Operaciones</a></li>
+                    <li><a href="../reports/index.aspx">Reportes</a></li>
+                    <li><a href="../ventas/index.aspx">Ventas</a></li>
+                    <li><a href="../logout.aspx">Salir</a></li>
+                    <li><a href="../manager/countrychoice.aspx">Oficina</a></li>
+                </ul>
+            </div>
+            <div align="right"><h3><asp:Label ID="Label2" runat="server" ForeColor ="White" Text="Departamento"></asp:Label>&nbsp;&nbsp;<asp:DropDownList ID="lb_sucursal" 
+                    runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_sucursal_SelectedIndexChanged">
+                </asp:DropDownList>
+                &nbsp;<asp:Label ID="l_contabilidad" runat="server" ForeColor ="White" Text="Contabilidad"></asp:Label>&nbsp;&nbsp;<asp:DropDownList 
+                    ID="lb_contabilidad" runat="server" AutoPostBack="True" 
+                    onselectedindexchanged="lb_contabilidad_SelectedIndexChanged">
+                </asp:DropDownList>
+                &nbsp;</h3>
+            <h3>
+            <br />
+                <asp:Label ID="Label1" runat="server" ForeColor="White" Text="TC:"></asp:Label>
+&nbsp;
+                <asp:Label ID="lbl_tipo_cambio" runat="server" ForeColor="White"></asp:Label>
+            </h3>
+            </div>
+        </div>
+        <div id="top-panel" 
+            style="font-weight: bold; font-style: italic; vertical-align: middle; text-align: right; color: #993400; font-size: 15px; text-transform: uppercase; text-decoration: underline overline;">
+                <%
+                UsuarioBean usuario = null;
+                usuario = (UsuarioBean)Session["usuario"];
+                lbl_nombre_sistema.Text = usuario.pais.Nombre_Sistema;
+                ArrayList Arr_Perfiles = (ArrayList)DB.getPerfilesxUsu(usuario.ID, usuario.PaisID);
+                %>
+                <asp:Label ID="lbl_nombre_sistema" runat="server"></asp:Label>
+        </div>
+        <div id="wrapper">
+            <div id="content">
+                <asp:ContentPlaceHolder ID="Contenido" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <div id="sidebar">
+  				<ul>
+                <li><h3><a href="#" class="user">Usuario</a></h3>
+                        <%
+                            int ban_reporte_consultas = 0;
+                            int ban_permiso_facturacion = 0;
+                            foreach (PerfilesBean Perfil in Arr_Perfiles)
+                            {
+                                if (Perfil.ID == 33)
+                                {
+                                    ban_reporte_consultas++;
+                                }
+                            }
+                            if (usuario.Aplicaciones.Contains("5"))
+                            {
+                                ban_permiso_facturacion++;
+                            }    
+                        %>  
+                        <ul>
+                            <li><a href=""  class="arrow_right">UID.: <%= usuario.ID %></a></li>
+                            <li><a href=""  class="arrow_right">IP.: <%= Request.ServerVariables["REMOTE_ADDR"]%></a></li>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Facturas</a></h3>   
+                        <ul>
+                        	<%if (ban_reporte_consultas > 0 && ban_permiso_facturacion == 0) {%>
+                                <li><a href="searchinvoice.aspx?action=0" class="search">Buscar Factura</a></li>
+                            <%} else { %>
+                                <li><a href="invoice.aspx"  class="pagenew">Nueva Factura</a></li>
+                                <li><a href="searchinvoice.aspx?action=0" class="search">Buscar Factura</a></li>
+                                <li><a href="invoice_proforma.aspx" class="search">Factura proforma</a></li>
+                                <li><a href="searchinvoice_proforma.aspx?action=0" class="search">Buscar Proforma</a></li>
+                            <%} %>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Recibos</a></h3>
+                        <ul>
+                        	<%if (ban_reporte_consultas > 0 && ban_permiso_facturacion == 0)
+                           {%>
+                                <li><a href="pop_buscarrcpt.aspx" class="search">Buscar Recibo</a></li>
+                            <%} else { %>
+                                <li><a href="newrcpt.aspx" class="pagenew">Generar Recibo</a></li>
+                                <li><a href="pop_buscarrcpt.aspx" class="search">Buscar Recibo</a></li>
+                            <%} %>
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">Cliente</a></h3>
+                        <ul>
+                            <%if (ban_reporte_consultas > 0 && ban_permiso_facturacion == 0)
+                              {%>
+                                <li><a href="searchNC_cliente.aspx" class="search">Buscar nota credito</a></li>
+                                <li><a href="searchND_cliente.aspx?action=1" class="search">Buscar nota debito</a></li>
+                            <%} else { %>
+                        	    <li><a href="searchinvoice.aspx?action=1" class="pagenew">Nota de credito</a></li>
+                        	    <li><a href="searchNC_cliente.aspx" class="search">Buscar nota credito</a></li>
+                                <li><a href="notadebito.aspx" class="pagenew">Nota de debito</a></li>
+                                <li><a href="searchND_cliente.aspx?action=1" class="search">Buscar nota debito</a></li>
+                            <%} %>
+                        </ul>
+                    </li>
+                    <%if (ban_permiso_facturacion > 0)
+                      {%>
+                    <li><h3><a href="#" class="folder_table">Pagos Cliente</a></h3>
+                        <ul>
+                            <li><a href="contrasenas_cliente.aspx" class="pagenew">Contraseñas</a></li>
+                            <li><a href="solicita_contrasenas.aspx" class="search">Reporte Contraseñas</a></li>
+                        </ul>
+                    </li>
+                    <%} %>
+				</ul>       
+          </div>
+          
+      </div>
+
+        <div id="footer">
+        <div id="credits">
+   		Elaborado por AIMAR, S.A.
+        </div>
+        <div id="styleswitcher">
+            <ul>
+                <li><a href="javascript: document.cookie='theme='; window.location.reload();" title="Default" id="defswitch">d</a></li>
+                <li><a href="javascript: document.cookie='theme=1'; window.location.reload();" title="Blue" id="blueswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=2'; window.location.reload();" title="Green" id="greenswitch">g</a></li>
+                <li><a href="javascript: document.cookie='theme=3'; window.location.reload();" title="Brown" id="brownswitch">b</a></li>
+                <li><a href="javascript: document.cookie='theme=4'; window.location.reload();" title="Mix" id="mixswitch">m</a></li>
+            </ul>
+        </div><br />
+
+        </div>
+</div>
+    </form>
+</body>
+</html>
+
